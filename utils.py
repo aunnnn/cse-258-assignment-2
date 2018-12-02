@@ -9,6 +9,7 @@ def load_dataset():
 
   # There's first weird column, so we remove it
   df = df.drop(df.columns[0], axis=1)
+
   return df, header
 
 # Load dataset and preprocess
