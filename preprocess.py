@@ -1,9 +1,8 @@
 import pandas as pd
 from pandas.api.types import CategoricalDtype
+from sklearn.preprocessing import MultiLabelBinarizer
 
-def __numerize_job_and_career_satisfaction(df):
-  # Do it manually since we want to maintain the order/number. 
-  career_satisfactions = [
+satisfactions = [
     'Extremely dissatisfied',
     'Moderately dissatisfied',
     'Slightly dissatisfied',
@@ -12,13 +11,23 @@ def __numerize_job_and_career_satisfaction(df):
     'Moderately satisfied',
     'Extremely satisfied']
 
-  cats = CategoricalDtype(categories=career_satisfactions, ordered=True)
-  df['CareerSatisfaction'] = df['CareerSatisfaction'].astype(cats)
-  df['CareerSatisfactionCode'] = df['CareerSatisfaction'].cat.codes - 3
+# Turn job satisfaction into number [-3 to 3] (From dissatisfied to satisfied)
+def numerize_job_satisfaction(df):
+  # Do it manually since we want to maintain the order/number. 
+  cats = CategoricalDtype(categories=satisfactions, ordered=True)
   df['JobSatisfaction'] = df['JobSatisfaction'].astype(cats)
-  df['JobSatisfactionCode'] = df['JobSatisfaction'].cat.codes - 3
+  df['JobSatisfaction'] = df['JobSatisfaction'].cat.codes - 3
+  # df['JobSatisfactionCode'] = df['JobSatisfaction'].cat.codes - 3
   return df
 
-def numerize_columns(df):
-    __numerize_job_and_career_satisfaction(df)
-    return df
+def gender_with_only_male_female_others(df):
+  gender = df['Gender']
+  gender[~((gender == 'Male') | (gender == 'Female'))] = 'Others'
+  df['Gender'] = gender
+  return df
+
+def multilabel_encode(df, cols, fill_na_with='Unknown'):
+  mlb = MultiLabelBinarizer()  
+  encoded = [pd.DataFrame(mlb.fit_transform(df[col].fillna(fill_na_with).str.split(';')), columns=mlb.classes_).add_prefix(col + "_") for col in cols]
+  # Drop original columns 
+  return df.drop(columns=cols).join(encoded)
