@@ -11,6 +11,16 @@ satisfactions = [
     'Moderately satisfied',
     'Extremely satisfied']
 
+# Starting with 0
+def numerize_column_with_orders(df, col, orders):
+  # Do it manually since we want to maintain the order/number. 
+  cats = CategoricalDtype(categories=orders, ordered=True)
+  df = df.copy()
+  df[col] = df[col].astype(cats)
+  # df[col] = df[col].cat.codes
+  # df['JobSatisfactionCode'] = df['JobSatisfaction'].cat.codes - 3
+  return df
+
 # Turn job satisfaction into number [-3 to 3] (From dissatisfied to satisfied)
 def numerize_job_satisfaction(df):
   # Do it manually since we want to maintain the order/number. 

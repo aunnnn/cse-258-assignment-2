@@ -58,7 +58,6 @@ class Columns:
     'Hobby', # bool
     'SkipMeals', # cat
     'OpenSource', # bool
-    'ErgonomicDevices', # mult
     'Exercise', # cat
   ]
 
